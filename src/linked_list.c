@@ -22,29 +22,30 @@ void list_insert(list_node **head, void *item)
 
 /* Delete item from the linked list */
 void list_delete(list_node **head, void *item){
-    list_node *prev = NULL, *curr = *head;
+	list_node *prev = NULL, *curr = *head;
 
-    while (curr != NULL && curr->data != item) {
-        prev = curr;
-        curr = curr->next;
-    }
+	while (curr != NULL && curr->data != item) {
+		prev = curr;
+		curr = curr->next;
+	}
 
-    if (curr != NULL) {
-        if (prev != NULL)
-            prev->next = curr->next;
-        else
+	if (curr != NULL) {
+		if (prev != NULL)
+			prev->next = curr->next;
+		else
 			*head = curr->next;
 
-        free(curr);
-    }
+		free(curr);
+	}
 }
 
+/* Traverse the list, printing the item keys */
 void list_traverse(list_node *head, void (*print)(void*))
 {
 	list_node *tmp = head;
 
-    while (tmp != NULL) {
+	while (tmp != NULL) {
 		print(tmp->data);
-        tmp = tmp->next;
+		tmp = tmp->next;
 	}
 }
