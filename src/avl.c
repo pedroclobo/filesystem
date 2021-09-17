@@ -3,7 +3,9 @@
 /* Create a new tree node */
 tree_node *tree_new(void *item)
 {
-	tree_node *new = (tree_node*) malloc(sizeof(tree_node));
+	tree_node *new = (tree_node*) safe_malloc(sizeof(tree_node));
+	new->left = NULL;
+	new->right = NULL;
 	new->data = item;
 	new->height = 1;
 
@@ -22,10 +24,9 @@ tree_node *tree_max(tree_node *root)
 /* Return the height of the tree */
 int tree_height(tree_node *root)
 {
-	if (root == NULL)
-		return 0;
-
-	return root->height;
+	if (root)
+		return root->height;
+	return 0;
 }
 
 /* Update the height of the tree, after operation */
@@ -125,22 +126,22 @@ tree_node *tree_balance(tree_node *root) {
 }
 
 /* Insert item in the AVL tree */
-void tree_insert(tree_node **root, void *item, int (*less)(void*, void*))
+void tree_insert(tree_node **root, void *item, char*(*key)(void*), int (*less)(void*, void*, char*(void*)))
 {
 	if (*root == NULL)
 		*root = tree_new(item);
 
-	else if (less(item, (*root)->data))
-		tree_insert(&(*root)->left, item, less);
+	else if (less(item, (*root)->data, key))
+		tree_insert(&(*root)->left, item, key, less);
 
 	else
-		tree_insert(&(*root)->right, item, less);
+		tree_insert(&(*root)->right, item, key, less);
 
 	*root = tree_balance(*root);
 }
 
 /* Delete item in the AVL tree */
-void tree_delete(tree_node **root, void *item, int (*less)(void*, void*))
+void tree_delete(tree_node **root, void *item, char* (*key)(void*), int (*less)(void*, void*, char* (void*)))
 {
 	tree_node *tmp = NULL;
 	void *tmp_data = NULL;
@@ -148,11 +149,11 @@ void tree_delete(tree_node **root, void *item, int (*less)(void*, void*))
 	if (*root == NULL)
 		return;
 
-	else if (less(item, (*root)->data))
-		tree_delete(&(*root)->left, item, less);
+	else if (less(item, (*root)->data, key))
+		tree_delete(&(*root)->left, item, key, less);
 
-	else if (less((*root)->data, item))
-		tree_delete(&(*root)->right, item, less);
+	else if (less((*root)->data, item, key))
+		tree_delete(&(*root)->right, item, key, less);
 
 	else {
 		if ((*root)->left != NULL && (*root)->right != NULL) {
@@ -160,7 +161,7 @@ void tree_delete(tree_node **root, void *item, int (*less)(void*, void*))
 			tmp_data = (*root)->data;
 			(*root)->data = tmp->data;
 			tmp->data = tmp_data;
-			tree_delete(&(*root)->left, tmp->data, less);
+			tree_delete(&(*root)->left, tmp->data, key, less);
 
 		} else {
 			tmp = (*root);
@@ -185,4 +186,14 @@ void tree_traverse(tree_node *root, void (*print)(void*))
 	tree_traverse(root->left, print);
 	print(root->data);
 	tree_traverse(root->right, print);
+}
+
+void tree_free(tree_node *root)
+{
+	if (root == NULL)
+		return;
+
+	tree_free(root->left);
+	tree_free(root->right);
+	free(root);
 }

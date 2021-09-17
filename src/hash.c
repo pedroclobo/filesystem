@@ -1,9 +1,9 @@
 #include "proj2.h"
 
 /* Hashing function */
-int hash_string(char* string, int size)
+int string_hash(char* string, int size)
 {
-	long int hash, a = 31415, b = 27183;
+	long hash, a = 31415, b = 27183;
 
 	for (hash = 0; *string != '\0'; string++, a = a * b % (size - 1)) {
 		hash = (a * hash + *string) % size;
@@ -13,38 +13,66 @@ int hash_string(char* string, int size)
 }
 
 /* Initialize hash table */
-void hash_init(hashtable *hash_t, int size)
+hashtable *init_hashtable(int size)
 {
 	int i;
+	hashtable *hash_t = (hashtable *) safe_malloc(sizeof(hashtable));
 
-	hash_t->table = (void**) malloc(size * sizeof(void*));
+	hash_t->table = (void**) safe_malloc(size * sizeof(void*));
 	hash_t->size = size;
 	hash_t->count = 0;
 
 	for (i = 0; i < size; i++) {
 		hash_t->table[i] = NULL;
 	}
+
+	return hash_t;
+}
+
+/*
+ *
+ */
+hashtable *expand_hashtable(hashtable* hash_t, char* (*key)(void*))
+{
+	int i = 0;
+	hashtable *new = init_hashtable(hash_t->size * 2);
+
+	for (i = 0; i < hash_t->size; i++) {
+		if (hash_t->table[i] != NULL)
+			insert_hashtable(&new, hash_t->table[i], key);
+	}
+
+	free_hashtable(hash_t, 0);
+
+	return new;
 }
 
 /* Insert item in the hash table */
-void hash_insert(hashtable *hash_t, void *item, char* (*key)(void*))
+void insert_hashtable(hashtable **hash_t, void *item, char* (*key)(void*))
 {
-	int i = hash_string(key(item), hash_t->size);
+	int i;
+
+	if (key(item) == NULL)
+		return;
+
+	i = string_hash(key(item), (*hash_t)->size);
 
 	/* Linear Probing */
-	while (hash_t->table[i] != NULL) i = (i + 1) % hash_t->size;
+	while ((*hash_t)->table[i] != NULL) i = (i + 1) % (*hash_t)->size;
+	(*hash_t)->table[i] = item;
+	(*hash_t)->count++;
 
-	hash_t->table[i] = item;
-	hash_t->count++;
+	if ((*hash_t)->count > ((*hash_t)->size / 2))
+		*hash_t = expand_hashtable(*hash_t, key);
 }
 
 /* Search the hash table for an item given its key */
-void *hash_search(hashtable *hash_t, char *value, char* (*key)(void*))
+void *search_hashtable(hashtable *hash_t, char *item_key, char* (*key)(void*))
 {
-	int i = hash_string(value, hash_t->size);
+	int i = string_hash(item_key, hash_t->size);
 
 	while (hash_t->table[i] != NULL)
-		if (!strcmp(key(hash_t->table[i]), value))
+		if (!strcmp(key(hash_t->table[i]), item_key))
 			return hash_t->table[i];
 		else
 			i = (i + 1) % hash_t->size;
@@ -52,14 +80,21 @@ void *hash_search(hashtable *hash_t, char *value, char* (*key)(void*))
 	return NULL;
 }
 
-/* Delete an item from the hash table given its key,
- * not freeing the item from memory */
-void hash_delete(hashtable *hash_t, char *value, char* (*key)(void*))
+/*
+ * Delete an item from the hash table given its key,
+ * not freeing the item from memory.
+ */
+void delete_hashtable(hashtable *hash_t, char *item_key, char* (*key)(void*))
 {
-	int i = hash_string(value, hash_t->size);
+	int i;
+
+	if (item_key == NULL)
+		return;
+
+	i = string_hash(item_key, hash_t->size);
 
 	while (hash_t->table[i] != NULL)
-		if (!strcmp(key(hash_t->table[i]), value)) {
+		if (!strcmp(key(hash_t->table[i]), item_key)) {
 			hash_t->table[i] = NULL;
 			hash_t->count--;
 		}
@@ -67,11 +102,22 @@ void hash_delete(hashtable *hash_t, char *value, char* (*key)(void*))
 			i = (i + 1) % hash_t->size;
 }
 
-void hash_print(hashtable *hash_t, void (*print)(void*))
+/* Destory hash table */
+void free_hashtable(hashtable *hash_t, int delete_all)
 {
+	directory *dir = NULL;
 	int i;
 
-	for (i = 0; i < hash_t->size; i++)
-		if (hash_t->table[i] != NULL)
-			print(hash_t->table[i]);
+	/* Free all directories */
+	if (delete_all == 1) {
+		for (i = 0; i < hash_t->size; i++) {
+			if (hash_t->table[i] != NULL) {
+				dir = (directory *) hash_t->table[i];
+				free_directory(dir);
+			}
+		}
+	}
+	free(hash_t->table);
+	free(hash_t);
 }
+

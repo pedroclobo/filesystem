@@ -5,7 +5,7 @@ void list_insert(list_node **head, void *item)
 {
 	list_node *tmp;
 
-	list_node *new = (list_node*) malloc(sizeof(list_node));
+	list_node *new = (list_node*) safe_malloc(sizeof(list_node));
 	new->data = item;
 	new->next = NULL;
 
@@ -48,4 +48,29 @@ void list_traverse(list_node *head, void (*print)(void*))
 		print(tmp->data);
 		tmp = tmp->next;
 	}
+}
+
+int list_contains(list_node *head, void *item)
+{
+	while (head != NULL) {
+		if (head->data == item)
+			return 1;
+		head = head->next;
+	}
+
+	return 0;
+}
+
+/* Free all linked list nodes from memory */
+void list_free(list_node *head) {
+	list_node *curr = head;
+	list_node *tmp = head;
+
+	while (curr != NULL) {
+		tmp = curr;
+		curr = curr->next;
+		free(tmp);
+	}
+
+	head = NULL;
 }
