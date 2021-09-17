@@ -1,11 +1,17 @@
+/*
+ * File: linked_list.c
+ * Author: Pedro Lobo
+ * Description: Simple linked list data structure functions.
+ */
+
 #include "proj2.h"
 
 /* Insert item at the end of the linked list */
-void list_insert(list_node **head, void *item)
-{
+void
+list_insert(list_node ** head, void *item) {
 	list_node *tmp;
 
-	list_node *new = (list_node*) safe_malloc(sizeof(list_node));
+	list_node *new = (list_node *) safe_malloc(sizeof(list_node));
 	new->data = item;
 	new->next = NULL;
 
@@ -14,14 +20,14 @@ void list_insert(list_node **head, void *item)
 		return;
 	}
 
-	for (tmp = *head; tmp->next != NULL; tmp = tmp->next)
-		;
+	for (tmp = *head; tmp->next != NULL; tmp = tmp->next);
 
 	tmp->next = new;
 }
 
 /* Delete item from the linked list */
-void list_delete(list_node **head, void *item){
+void
+list_delete(list_node ** head, void *item) {
 	list_node *prev = NULL, *curr = *head;
 
 	while (curr != NULL && curr->data != item) {
@@ -40,8 +46,8 @@ void list_delete(list_node **head, void *item){
 }
 
 /* Traverse the list, printing the item keys */
-void list_traverse(list_node *head, void (*print)(void*))
-{
+void
+list_traverse(list_node * head, void (*print)(void *)) {
 	list_node *tmp = head;
 
 	while (tmp != NULL) {
@@ -50,8 +56,8 @@ void list_traverse(list_node *head, void (*print)(void*))
 	}
 }
 
-int list_contains(list_node *head, void *item)
-{
+int
+list_contains(list_node * head, void *item) {
 	while (head != NULL) {
 		if (head->data == item)
 			return 1;
@@ -62,7 +68,8 @@ int list_contains(list_node *head, void *item)
 }
 
 /* Free all linked list nodes from memory */
-void list_free(list_node *head) {
+void
+list_free(list_node * head) {
 	list_node *curr = head;
 	list_node *tmp = head;
 

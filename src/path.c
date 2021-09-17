@@ -1,11 +1,17 @@
+/*
+ * File: path.c
+ * Author: Pedro Lobo
+ * Description: Path structure related functions.
+ */
+
 #include "proj2.h"
 
 /*
  * Create a new path structure,
  * with name and value.
  */
-path *new_path(char *name, char *value)
-{
+path *
+new_path(char *name, char *value) {
 	path *new = NULL;
 
 	if (name == NULL)
@@ -19,7 +25,9 @@ path *new_path(char *name, char *value)
 	if (value == NULL)
 		new->value = value;
 	else {
-		new->value = (char *) safe_malloc((strlen(value) + 1) * sizeof(char));
+		new->value =
+			(char *) safe_malloc((strlen(value) + 1) *
+					     sizeof(char));
 		strcpy(new->value, value);
 	}
 
@@ -29,8 +37,8 @@ path *new_path(char *name, char *value)
 /*
  * Free path structure from memory.
  */
-void free_path(path *p)
-{
+void
+free_path(path * p) {
 	if (p) {
 		free(p->name);
 		free(p->value);
@@ -41,8 +49,8 @@ void free_path(path *p)
 /*
  * Determines if a path has an associated value.
  */
-int has_value(path *p)
-{
+int
+has_value(path * p) {
 	if (p)
 		return p->value != NULL;
 
@@ -52,8 +60,8 @@ int has_value(path *p)
 /*
  * If valid, return the path name.
  */
-char *get_path_name(path *p)
-{
+char *
+get_path_name(path * p) {
 	if (p)
 		return p->name;
 
@@ -63,8 +71,8 @@ char *get_path_name(path *p)
 /*
  * If valid, return the path value.
  */
-char *get_path_value(path *p)
-{
+char *
+get_path_value(path * p) {
 	if (p)
 		if (has_value(p))
 			return p->value;
@@ -77,8 +85,8 @@ char *get_path_value(path *p)
  * If the path already has a value associated with it,
  * change it if it is valid.
  */
-void add_path_value(path *p, char *value)
-{
+void
+add_path_value(path * p, char *value) {
 	if (value == NULL)
 		return;
 
@@ -94,8 +102,8 @@ void add_path_value(path *p, char *value)
  * Emtpy path names get a depth of 0.
  * Otherwise is corresponds to the number of '/'.
  */
-int get_path_name_depth(char *name)
-{
+int
+get_path_name_depth(char *name) {
 	int i, depth = 0;
 
 	for (i = 0; name[i]; i++) {
@@ -110,8 +118,8 @@ int get_path_name_depth(char *name)
  * Get the parent path name.
  * For path names with a depth of 1, parent is "root".
  */
-void get_parent_path_name(char *name, char **parent)
-{
+void
+get_parent_path_name(char *name, char **parent) {
 	int depth = get_path_name_depth(name), i = 0, s = 0;
 
 	if (depth == 0) {
@@ -132,16 +140,16 @@ void get_parent_path_name(char *name, char **parent)
 		(*parent)[i] = name[i];
 		i++;
 	}
-	(*parent)[i-1] = '\0';
-	*parent = realloc(*parent, (i-1) * sizeof(char));
+	(*parent)[i - 1] = '\0';
+	*parent = realloc(*parent, (i - 1) * sizeof(char));
 }
 
 /*
  * Get the child path name.
  * For path names with a depth of 1, child is the path name.
  */
-void get_child_path_name(char *name, char **child)
-{
+void
+get_child_path_name(char *name, char **child) {
 	int depth = get_path_name_depth(name), i = 0, s = 0;
 
 	if (depth == 0) {
@@ -151,7 +159,7 @@ void get_child_path_name(char *name, char **child)
 	}
 
 	else if (depth == 1) {
-		strcpy(*child, name+1);
+		strcpy(*child, name + 1);
 		return;
 	}
 
@@ -171,13 +179,13 @@ void get_child_path_name(char *name, char **child)
 /*
  * Trim the existing separators in path names.
  */
-void trim_directory_name(char *name, char **res)
-{
+void
+trim_directory_name(char *name, char **res) {
 	char *token = strtok(name, "/");
 	strcpy(*res, "/");
 	strcat(*res, token);
 
-	while((token = strtok(NULL, "/"))) {
+	while ((token = strtok(NULL, "/"))) {
 		strcat(*res, "/");
 		strcat(*res, token);
 	}
@@ -185,4 +193,3 @@ void trim_directory_name(char *name, char **res)
 
 	*res = realloc(*res, (strlen(*res) + 1) * sizeof(char));
 }
-

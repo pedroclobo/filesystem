@@ -1,19 +1,24 @@
+/*
+ * File: proj1.c
+ * Author: Pedro Lobo
+ * Description: Command functions.
+ */
+
 #include "proj2.h"
 
 /* Print all available commands */
-void help_command()
-{
-	printf(
-		"help: %s\n"
-	    "quit: %s\n"
-	    "set: %s\n"
-	    "print: %s\n"
-	    "find: %s\n"
-	    "list: %s\n"
-	    "search: %s\n"
-	    "delete: %s\n",
-		DESC_HELP, DESC_QUIT, DESC_SET, DESC_PRINT, DESC_FIND, DESC_LIST,
-		DESC_SEARCH, DESC_DELETE);
+void
+help_command() {
+	printf("help: %s\n"
+	       "quit: %s\n"
+	       "set: %s\n"
+	       "print: %s\n"
+	       "find: %s\n"
+	       "list: %s\n"
+	       "search: %s\n"
+	       "delete: %s\n",
+	       DESC_HELP, DESC_QUIT, DESC_SET, DESC_PRINT, DESC_FIND, DESC_LIST,
+	       DESC_SEARCH, DESC_DELETE);
 }
 
 /*
@@ -21,21 +26,22 @@ void help_command()
  * If the directory doesn't exists, create it,
  * creating all parent directories too.
  */
-void set_command(char *arguments, container *global)
-{
+void
+set_command(char *arguments, container * global) {
 	directory *dir = NULL;
 
 	/* Get name and value arguments */
 	char *token = strtok(arguments, " \n");
 	char *value = strtok(NULL, "\n");
 	char *name = NULL;
-	if (token == NULL) return;
+	if (token == NULL)
+		return;
 	name = (char *) safe_malloc((strlen(token) + 2) * sizeof(char));
 
 	trim_directory_name(token, &name);
 
 	if (!directory_exists(name, global))
-		add_directory_recursively(name, value, NULL, global);
+		  add_directory_recursively(name, value, NULL, global);
 	else {
 		dir = get_directory_by_name(name, global);
 		add_directory_value(dir, value);
@@ -48,8 +54,8 @@ void set_command(char *arguments, container *global)
  * Print all directory names and values.
  * Results are search by depth and by order of creation.
  */
-void print_command(container *global)
-{
+void
+print_command(container * global) {
 	directory *root = get_directory_by_name("root", global);
 
 	print_subdirectories(root, global);
@@ -60,8 +66,8 @@ void print_command(container *global)
  * If there is no directory with the name given, raise an error.
  * If the directory has no value, raise an error.
  */
-void find_command(char *arguments, container *global)
-{
+void
+find_command(char *arguments, container * global) {
 	directory *dir = NULL;
 
 	/* Get name argument */
@@ -86,8 +92,8 @@ void find_command(char *arguments, container *global)
 /*
  * List all imediate components of a subdirectory.
  */
-void list_command(char *arguments, container *global)
-{
+void
+list_command(char *arguments, container * global) {
 	directory *dir = get_directory_by_name("root", global);
 
 	/* Get name argument */
@@ -111,8 +117,8 @@ void list_command(char *arguments, container *global)
 		free(name);
 }
 
-void search_command(char *cmd, container *global)
-{
+void
+search_command(char *cmd, container * global) {
 	directory *dir = NULL;
 
 	/* Get value argument */
@@ -126,8 +132,8 @@ void search_command(char *cmd, container *global)
 		printf("%s\n", get_path_name(dir->path));
 }
 
-void delete_command(char *arguments, container *global)
-{
+void
+delete_command(char *arguments, container * global) {
 	directory *dir = NULL;
 
 	/* Get name and value arguments */
@@ -137,7 +143,7 @@ void delete_command(char *arguments, container *global)
 	if (token == NULL)
 		remove_all_directories(global);
 	else {
- 		name = (char *) safe_malloc((strlen(token) + 2) * sizeof(char));
+		name = (char *) safe_malloc((strlen(token) + 2) * sizeof(char));
 		trim_directory_name(token, &name);
 		dir = get_directory_by_name(name, global);
 		remove_directory_recursively(dir, global);
@@ -151,14 +157,15 @@ void delete_command(char *arguments, container *global)
  * Return 1 if the command invoked isn't the quit command.
  * Return 0 otherwise.
  */
-int parse_command(char *cmd, container *global)
-{
+int
+parse_command(char *cmd, container * global) {
 	int result = 1;
 	char *cmd_flag = NULL;
 
 	/* Get command from user */
 	cmd = fgets(cmd, MAX_CMD_SIZE, stdin);
-	if (cmd == NULL) return 1;
+	if (cmd == NULL)
+		return 1;
 
 	cmd_flag = strtok(cmd, WHITESPACE);
 
@@ -184,13 +191,13 @@ int parse_command(char *cmd, container *global)
 	return result;
 }
 
-int main() {
+int
+main() {
 	char *cmd = (char *) safe_malloc(MAX_CMD_SIZE * sizeof(char));
 	container global;
 	init_container(&global);
 
-	while(parse_command(cmd, &global))
-		;
+	while (parse_command(cmd, &global));
 
 	free_container(&global);
 	free(cmd);

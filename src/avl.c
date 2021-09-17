@@ -1,9 +1,15 @@
+/*
+ * File: avl.c
+ * Author: Pedro Lobo
+ * Description: AVL tree data structure functions.
+ */
+
 #include "proj2.h"
 
 /* Create a new tree node */
-tree_node *tree_new(void *item)
-{
-	tree_node *new = (tree_node*) safe_malloc(sizeof(tree_node));
+tree_node *
+tree_new(void *item) {
+	tree_node *new = (tree_node *) safe_malloc(sizeof(tree_node));
 	new->left = NULL;
 	new->right = NULL;
 	new->data = item;
@@ -13,8 +19,8 @@ tree_node *tree_new(void *item)
 }
 
 /* Return the max value tree node */
-tree_node *tree_max(tree_node *root)
-{
+tree_node *
+tree_max(tree_node * root) {
 	if (root->right != NULL)
 		tree_max(root->right);
 
@@ -22,16 +28,16 @@ tree_node *tree_max(tree_node *root)
 }
 
 /* Return the height of the tree */
-int tree_height(tree_node *root)
-{
+int
+tree_height(tree_node * root) {
 	if (root)
 		return root->height;
 	return 0;
 }
 
 /* Update the height of the tree, after operation */
-void tree_update_height(tree_node *root)
-{
+void
+tree_update_height(tree_node * root) {
 	int h_left = tree_height(root->left);
 	int h_right = tree_height(root->right);
 
@@ -39,8 +45,8 @@ void tree_update_height(tree_node *root)
 }
 
 /* Rotate left AVL operation */
-tree_node *tree_rotL(tree_node *root)
-{
+tree_node *
+tree_rotL(tree_node * root) {
 	tree_node *tmp = root->right;
 	root->right = tmp->left;
 	tmp->left = root;
@@ -52,8 +58,8 @@ tree_node *tree_rotL(tree_node *root)
 }
 
 /* Rotate right AVL operation */
-tree_node *tree_rotR(tree_node *root)
-{
+tree_node *
+tree_rotR(tree_node * root) {
 	tree_node *tmp = root->left;
 	root->left = tmp->right;
 	tmp->right = root;
@@ -66,8 +72,8 @@ tree_node *tree_rotR(tree_node *root)
 
 
 /* Rotate left, then right AVL operation */
-tree_node *tree_rotLR(tree_node *root)
-{
+tree_node *
+tree_rotLR(tree_node * root) {
 	if (root == NULL)
 		return root;
 
@@ -77,8 +83,8 @@ tree_node *tree_rotLR(tree_node *root)
 }
 
 /* Rotate right, then left AVL operation */
-tree_node *tree_rotRL(tree_node *root)
-{
+tree_node *
+tree_rotRL(tree_node * root) {
 	if (root == NULL)
 		return root;
 
@@ -88,8 +94,8 @@ tree_node *tree_rotRL(tree_node *root)
 }
 
 /* Return the tree balance factor */
-int tree_balance_factor(tree_node *root)
-{
+int
+tree_balance_factor(tree_node * root) {
 	if (root == NULL)
 		return 0;
 
@@ -97,7 +103,8 @@ int tree_balance_factor(tree_node *root)
 }
 
 /* Balance the AVL tree */
-tree_node *tree_balance(tree_node *root) {
+tree_node *
+tree_balance(tree_node * root) {
 	int balance_factor;
 
 	if (root == NULL)
@@ -126,8 +133,9 @@ tree_node *tree_balance(tree_node *root) {
 }
 
 /* Insert item in the AVL tree */
-void tree_insert(tree_node **root, void *item, char*(*key)(void*), int (*less)(void*, void*, char*(void*)))
-{
+void
+tree_insert(tree_node ** root, void *item, char *(*key)(void *),
+	    int (*less)(void *, void *, char *(void *))) {
 	if (*root == NULL)
 		*root = tree_new(item);
 
@@ -141,8 +149,9 @@ void tree_insert(tree_node **root, void *item, char*(*key)(void*), int (*less)(v
 }
 
 /* Delete item in the AVL tree */
-void tree_delete(tree_node **root, void *item, char* (*key)(void*), int (*less)(void*, void*, char* (void*)))
-{
+void
+tree_delete(tree_node ** root, void *item, char *(*key)(void *),
+	    int (*less)(void *, void *, char * (void *))) {
 	tree_node *tmp = NULL;
 	void *tmp_data = NULL;
 
@@ -178,8 +187,8 @@ void tree_delete(tree_node **root, void *item, char* (*key)(void*), int (*less)(
 }
 
 /* Traverse the AVL tree */
-void tree_traverse(tree_node *root, void (*print)(void*))
-{
+void
+tree_traverse(tree_node * root, void (*print)(void *)) {
 	if (root == NULL)
 		return;
 
@@ -188,8 +197,8 @@ void tree_traverse(tree_node *root, void (*print)(void*))
 	tree_traverse(root->right, print);
 }
 
-void tree_free(tree_node *root)
-{
+void
+tree_free(tree_node * root) {
 	if (root == NULL)
 		return;
 

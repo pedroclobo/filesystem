@@ -1,6 +1,13 @@
+/*
+ * File: utils.c
+ * Author: Pedro Lobo
+ * Description: Utility functions.
+ */
+
 #include "proj2.h"
 
-void *safe_malloc(size_t size) {
+void *
+safe_malloc(size_t size) {
 	void *p = malloc(size);
 
 	if (p != NULL)

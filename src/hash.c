@@ -1,8 +1,14 @@
+/*
+ * File: hash.c
+ * Author: Pedro Lobo
+ * Description: Hash table data structure functions.
+ */
+
 #include "proj2.h"
 
 /* Hashing function */
-int string_hash(char* string, int size)
-{
+int
+string_hash(char *string, int size) {
 	long hash, a = 31415, b = 27183;
 
 	for (hash = 0; *string != '\0'; string++, a = a * b % (size - 1)) {
@@ -13,12 +19,12 @@ int string_hash(char* string, int size)
 }
 
 /* Initialize hash table */
-hashtable *init_hashtable(int size)
-{
+hashtable *
+init_hashtable(int size) {
 	int i;
 	hashtable *hash_t = (hashtable *) safe_malloc(sizeof(hashtable));
 
-	hash_t->table = (void**) safe_malloc(size * sizeof(void*));
+	hash_t->table = (void **) safe_malloc(size * sizeof(void *));
 	hash_t->size = size;
 	hash_t->count = 0;
 
@@ -32,8 +38,8 @@ hashtable *init_hashtable(int size)
 /*
  *
  */
-hashtable *expand_hashtable(hashtable* hash_t, char* (*key)(void*))
-{
+hashtable *
+expand_hashtable(hashtable * hash_t, char *(*key)(void *)) {
 	int i = 0;
 	hashtable *new = init_hashtable(hash_t->size * 2);
 
@@ -48,8 +54,8 @@ hashtable *expand_hashtable(hashtable* hash_t, char* (*key)(void*))
 }
 
 /* Insert item in the hash table */
-void insert_hashtable(hashtable **hash_t, void *item, char* (*key)(void*))
-{
+void
+insert_hashtable(hashtable ** hash_t, void *item, char *(*key)(void *)) {
 	int i;
 
 	if (key(item) == NULL)
@@ -58,7 +64,8 @@ void insert_hashtable(hashtable **hash_t, void *item, char* (*key)(void*))
 	i = string_hash(key(item), (*hash_t)->size);
 
 	/* Linear Probing */
-	while ((*hash_t)->table[i] != NULL) i = (i + 1) % (*hash_t)->size;
+	while ((*hash_t)->table[i] != NULL)
+		i = (i + 1) % (*hash_t)->size;
 	(*hash_t)->table[i] = item;
 	(*hash_t)->count++;
 
@@ -67,8 +74,8 @@ void insert_hashtable(hashtable **hash_t, void *item, char* (*key)(void*))
 }
 
 /* Search the hash table for an item given its key */
-void *search_hashtable(hashtable *hash_t, char *item_key, char* (*key)(void*))
-{
+void *
+search_hashtable(hashtable * hash_t, char *item_key, char *(*key)(void *)) {
 	int i = string_hash(item_key, hash_t->size);
 
 	while (hash_t->table[i] != NULL)
@@ -84,8 +91,8 @@ void *search_hashtable(hashtable *hash_t, char *item_key, char* (*key)(void*))
  * Delete an item from the hash table given its key,
  * not freeing the item from memory.
  */
-void delete_hashtable(hashtable *hash_t, char *item_key, char* (*key)(void*))
-{
+void
+delete_hashtable(hashtable * hash_t, char *item_key, char *(*key)(void *)) {
 	int i;
 
 	if (item_key == NULL)
@@ -97,14 +104,13 @@ void delete_hashtable(hashtable *hash_t, char *item_key, char* (*key)(void*))
 		if (!strcmp(key(hash_t->table[i]), item_key)) {
 			hash_t->table[i] = NULL;
 			hash_t->count--;
-		}
-		else
+		} else
 			i = (i + 1) % hash_t->size;
 }
 
 /* Destory hash table */
-void free_hashtable(hashtable *hash_t, int delete_all)
-{
+void
+free_hashtable(hashtable * hash_t, int delete_all) {
 	directory *dir = NULL;
 	int i;
 
@@ -120,4 +126,3 @@ void free_hashtable(hashtable *hash_t, int delete_all)
 	free(hash_t->table);
 	free(hash_t);
 }
-
